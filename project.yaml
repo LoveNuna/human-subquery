@@ -1,0 +1,60 @@
+specVersion: 1.0.0
+name: human-subql-starter
+version: 0.0.1
+runner:
+  node:
+    name: "@subql/node-cosmos"
+    version: "*"
+  query:
+    name: "@subql/query"
+    version: "*"
+description: >-
+  This project can be use as a starting point for developing your Cosmos (Juno) based SubQuery project
+repository: https://github.com/subquery/juno-subql-starter
+schema:
+  file: ./schema.graphql
+
+network:
+  chainId: testhuman 
+  # This endpoint must be a public non-pruned archive node
+  # Public nodes may be rate limited, which can affect indexing speed
+  # When developing your project we suggest getting a private API key
+  # You can get them from OnFinality for free https://app.onfinality.io
+  # https://documentation.onfinality.io/support/the-enhanced-api-service
+  # endpoint: https://juno.api.onfinality.io/public
+  endpoint: https://devnet-explorer-rpc.humans.zone
+  # Optionally provide the HTTP endpoint of a full chain dictionary to speed up processing
+  # dictionary: https://api.subquery.network/sq/subquery/cosmos-juno-dictionary
+
+dataSources:
+  - kind: cosmos/Runtime
+    startBlock: 687000 # first block on the fourth iteration of juno
+    mapping:
+      file: "./dist/index.js"
+      handlers:
+        # Using block handlers slows your project down as they can be executed with each and every block. Only use if you need to
+        # - handler: handleBlock
+        #   kind: cosmos/BlockHandler
+        # Using transaction handlers without filters slows your project down as they can be executed with each and every block
+        # - handler: handleTransaction
+        #   kind: cosmos/TransactionHandler
+        - handler: handleEvent
+          kind: cosmos/EventHandler
+          filter:
+            type: wasm
+            messageFilter:
+              type: "/cosmwasm.wasm.v1.MsgExecuteContract"
+              # contractCall field can be specified here too
+              # values: # A set of key/value pairs that are present in the message data
+              #   contract: "human198zucwm5phhm59ta5pqtq5f3vffvf5qpmcqnl74aq86dr3lpap4qzjrz4x"
+        # - handler: handleMessage
+        #   kind: cosmos/MessageHandler
+        #   filter:
+        #     type: "/cosmwasm.wasm.v1.MsgExecuteContract"
+        #     values:
+        #       contract: "human10fxj5f33jedt96a82dgkt96tt2pahq3h8rdjsnn2p07x6s6aqc6s6u2j8s"
+
+            # Filter to only messages with the provide_liquidity function call
+            #contractCall: "provide_liquidity" # The name of the contract function that was called
+            #values: # A set of key/value pairs that are present in the message data
+            #contract: "juno1v99ehkuetkpf0yxdry8ce92yeqaeaa7lyxr2aagkesrw67wcsn8qxpxay0"
