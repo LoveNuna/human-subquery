@@ -28,7 +28,7 @@ network:
 
 dataSources:
   - kind: cosmos/Runtime
-    startBlock: 687000 # first block on the fourth iteration of juno
+    startBlock: 704000 # first block on the fourth iteration of juno
     mapping:
       file: "./dist/index.js"
       handlers:
@@ -38,15 +38,37 @@ dataSources:
         # Using transaction handlers without filters slows your project down as they can be executed with each and every block
         # - handler: handleTransaction
         #   kind: cosmos/TransactionHandler
-        - handler: handleEvent
+        # - handler: handleSumSellingAmount
+        #   kind: cosmos/EventHandler
+        #   filter:
+        #     type: wasm
+        #     messageFilter:
+        #       type: "/cosmwasm.wasm.v1.MsgExecuteContract"
+        #       values: # This is the specific smart contract that we are subscribing to
+        #         contract: "human18v7v822rqa9q7ufqcngaqn9pvznnw3t67j9h5qn5kzhgca65k6zqv5qqwg"
+        - handler: handleSellingEvent
           kind: cosmos/EventHandler
           filter:
             type: wasm
+            attributes:
+              _contract_address: "human1qtq8rgljlhlq6tf0a78y2y6zuyhjatzqx9quaqc4jaf5fgymeays22s7te"
+              human_action: "human_marketplace_buy_fixed_price"
             messageFilter:
               type: "/cosmwasm.wasm.v1.MsgExecuteContract"
-              # contractCall field can be specified here too
-              # values: # A set of key/value pairs that are present in the message data
-              #   contract: "human198zucwm5phhm59ta5pqtq5f3vffvf5qpmcqnl74aq86dr3lpap4qzjrz4x"
+              values:
+                contract: "human1qtq8rgljlhlq6tf0a78y2y6zuyhjatzqx9quaqc4jaf5fgymeays22s7te"
+
+        - handler: handleSellingEvent
+          kind: cosmos/EventHandler
+          filter:
+            type: wasm
+            attributes:
+              _contract_address: "human1qtq8rgljlhlq6tf0a78y2y6zuyhjatzqx9quaqc4jaf5fgymeays22s7te"
+              human_action: "human_marketplace_accept_bid"
+            messageFilter:
+              type: "/cosmwasm.wasm.v1.MsgExecuteContract"
+              # contractCall: "execute_accept_bid" # The name of the contract function that was called
+
         # - handler: handleMessage
         #   kind: cosmos/MessageHandler
         #   filter:

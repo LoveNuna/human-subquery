@@ -7,18 +7,17 @@
 #   height: BigInt!
 # }
 
-type ExecuteEvent @entity {
+type ExecuteSellingEvent @entity {
   id: ID!
   blockHeight: BigInt!
   txHash: String!
-  contractAddress: String!
   action: String!
   collection: String!
   tokenId: String!
-  price: String!
-  expires: String!
+  price: BigInt!
   seller: String!
   buyer: String!
+  time: BigInt!
 }
 
 type Transaction @entity {
@@ -37,5 +36,10 @@ type Message @entity {
 
 type Block @entity {
   id: ID! # The block hash
-  height: BigInt!
+  blockHeight: BigInt!
+}
+
+type CollectionEvent @entity {
+  id: ID!
+  amount: BigInt!
 }

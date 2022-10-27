@@ -1,4 +1,4 @@
-import { Block, ExecuteEvent, Message, Transaction } from "../types";
+import { Block, Message, Transaction, ExecuteSellingEvent, CollectionEvent } from "../types";
 import {
   CosmosEvent,
   CosmosBlock,
@@ -8,21 +8,21 @@ import {
 import { Attribute } from "@cosmjs/stargate/build/logs";
 
 const defaultResponse = {
-  _contract_address: "",
-  action: "",
+  human_action: "",
   collection: "",
   token_id: "",
-  price: "",
+  price: 0,
   expires: "",
   seller: "",
-  buyer: ""
+  buyer: "",
+  time: 0
 }
 
 export async function handleBlock(block: CosmosBlock): Promise<void> {
   // If you wanted to index each block in Cosmos (Juno), you could do that here
   const blockRecord = Block.create({
     id: block.block.id,
-    height: BigInt(block.block.header.height),
+    blockHeight: BigInt(block.block.header.height),
   });
   await blockRecord.save();
 }
@@ -47,23 +47,37 @@ export async function handleMessage(msg: CosmosMessage): Promise<void> {
   await messageRecord.save();
 }
 
-export async function handleEvent(event: CosmosEvent): Promise<void> {
+function createCollectionEvent(seller: String): CollectionEvent {
+  const entity = new CollectionEvent(seller.toString());
+  entity.amount = BigInt(0);
+  return entity;
+}
+
+export async function handleSellingEvent(event: CosmosEvent): Promise<void> {
   const attr = event.event.attributes;
   const data = await parseAttributes(attr);
-  const eventRecord = ExecuteEvent.create({
+  const eventRecord = ExecuteSellingEvent.create({
     id: `${event.tx.hash}-${event.msg.idx}-${event.idx}`,
     blockHeight: BigInt(event.block.block.header.height),
+    price: BigInt(data.price),
     txHash: event.tx.hash,
-    contractAddress: data?._contract_address,
-    action: data?.action,
+    action: data?.human_action,
     collection: data?.collection,
     tokenId: data?.token_id,
-    price: data?.price,
-    expires: data?.expires,
+    time: BigInt(Math.floor(data.time)),
     seller: data?.seller,
     buyer: data?.buyer
   });
 
+  // total sales of users
+  let entity = await CollectionEvent.get(data.collection.toString());
+  if (entity === undefined){
+    entity = createCollectionEvent(data.collection.toString());
+  }
+
+  entity.amount = entity.amount + BigInt(data.price);
+
+  await entity.save();
   await eventRecord.save();
 }
 
