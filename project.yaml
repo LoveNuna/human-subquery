@@ -28,7 +28,7 @@ network:
 
 dataSources:
   - kind: cosmos/Runtime
-    startBlock: 704000 # first block on the fourth iteration of juno
+    startBlock: 717300 # first block on the fourth iteration of juno
     mapping:
       file: "./dist/index.js"
       handlers:
@@ -51,32 +51,30 @@ dataSources:
           filter:
             type: wasm
             attributes:
-              _contract_address: "human1qtq8rgljlhlq6tf0a78y2y6zuyhjatzqx9quaqc4jaf5fgymeays22s7te"
+              _contract_address: "human1vtjh0qqjr7m9qshqn5mfxsd6lsafhfj8pqlczsm8754pxl8fajfqlxcrqd"
               human_action: "human_marketplace_buy_fixed_price"
             messageFilter:
               type: "/cosmwasm.wasm.v1.MsgExecuteContract"
               values:
-                contract: "human1qtq8rgljlhlq6tf0a78y2y6zuyhjatzqx9quaqc4jaf5fgymeays22s7te"
+                contract: "human1vtjh0qqjr7m9qshqn5mfxsd6lsafhfj8pqlczsm8754pxl8fajfqlxcrqd"
 
         - handler: handleSellingEvent
           kind: cosmos/EventHandler
           filter:
             type: wasm
             attributes:
-              _contract_address: "human1qtq8rgljlhlq6tf0a78y2y6zuyhjatzqx9quaqc4jaf5fgymeays22s7te"
+              _contract_address: "human1vtjh0qqjr7m9qshqn5mfxsd6lsafhfj8pqlczsm8754pxl8fajfqlxcrqd"
               human_action: "human_marketplace_accept_bid"
             messageFilter:
               type: "/cosmwasm.wasm.v1.MsgExecuteContract"
               # contractCall: "execute_accept_bid" # The name of the contract function that was called
+        - handler: handleMintEvent
+          kind: cosmos/EventHandler
+          filter:
+            type: wasm
+            attributes:
+              human_nft_action:  "human_marketplace_mint"
+            messageFilter: 
+              type: "/cosmwasm.wasm.v1.MsgExecuteContract"
 
-        # - handler: handleMessage
-        #   kind: cosmos/MessageHandler
-        #   filter:
-        #     type: "/cosmwasm.wasm.v1.MsgExecuteContract"
-        #     values:
-        #       contract: "human10fxj5f33jedt96a82dgkt96tt2pahq3h8rdjsnn2p07x6s6aqc6s6u2j8s"
-
-            # Filter to only messages with the provide_liquidity function call
-            #contractCall: "provide_liquidity" # The name of the contract function that was called
-            #values: # A set of key/value pairs that are present in the message data
-            #contract: "juno1v99ehkuetkpf0yxdry8ce92yeqaeaa7lyxr2aagkesrw67wcsn8qxpxay0"
+      

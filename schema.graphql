@@ -20,26 +20,38 @@ type ExecuteSellingEvent @entity {
   time: BigInt!
 }
 
-type Transaction @entity {
-  id: ID!
-  blockHeight: BigInt!
-  timestamp: String!
-}
+# type Transaction @entity {
+#   id: ID!
+#   blockHeight: BigInt!
+#   timestamp: String!
+# }
 
-type Message @entity {
-  id: ID!
-  blockHeight: BigInt
-  txHash: String
-  sender: String
-  contract: String
-}
+# type Message @entity {
+#   id: ID!
+#   blockHeight: BigInt
+#   txHash: String
+#   sender: String
+#   contract: String
+# }
 
-type Block @entity {
-  id: ID! # The block hash
-  blockHeight: BigInt!
-}
+# type Block @entity {
+#   id: ID! # The block hash
+#   blockHeight: BigInt!
+# }
 
 type CollectionEvent @entity {
   id: ID!
   amount: BigInt!
+}
+
+type MintEvent @entity {
+  id: ID!
+  collection: String!
+  tokenId: String!
+  minter: String!
+  owner: String!
+  time: BigInt!
+  random: Int!
+  blockHeight: BigInt
+  txHash: String
 }
